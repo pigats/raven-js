@@ -258,7 +258,7 @@ Raven.prototype = {
                 return func.apply(this, args);
             } catch(e) {
                 self._ignoreNextOnError();
-                self.captureException(e, options);
+                self.captureException(e, options, 1);
                 throw e;
             }
         }
@@ -303,9 +303,11 @@ Raven.prototype = {
      * @param {object} options A specific set of options for this error [optional]
      * @return {Raven}
      */
-    captureException: function(ex, options) {
+    captureException: function(ex, options, skipframes) {
+        skipframes = skipframes || 0;
+
         // If not an Error is passed through, recall as a message instead
-        if (!isError(ex)) return this.captureMessage(ex, options);
+        if (!isError(ex)) return this.captureMessage(ex, options, skipframes + 1);
 
         // Store the raw exception object for potential debugging and introspection
         this._lastCapturedException = ex;
@@ -317,7 +319,7 @@ Raven.prototype = {
         // report on.
         try {
             var stack = TraceKit.computeStackTrace(ex);
-            this._handleStackInfo(stack, options);
+            this._handleStackInfo(stack, options, skipframes);
         } catch(ex1) {
             if(ex !== ex1) {
                 throw ex1;
@@ -334,7 +336,7 @@ Raven.prototype = {
      * @param {object} options A specific set of options for this message [optional]
      * @return {Raven}
      */
-    captureMessage: function(msg, options) {
+    captureMessage: function(msg, options, skipframes) {
         // config() automagically converts ignoreErrors from a list to a RegExp so we need to test for an
         // early call; we'll error on the side of logging anything called before configuration since it's
         // probably something you should see:
@@ -1030,7 +1032,7 @@ Raven.prototype = {
         }
     },
 
-    _handleStackInfo: function(stackInfo, options) {
+    _handleStackInfo: function(stackInfo, options, skipframes) {
         var self = this;
         var frames = [];
 
@@ -1041,6 +1043,10 @@ Raven.prototype = {
                     frames.push(frame);
                 }
             });
+
+            if (skipframes) {
+                frames = frames.slice(0, skipframes);
+            }
         }
 
         this._triggerEvent('handle', {

@@ -863,6 +863,7 @@ Raven.prototype = {
             }
         }
 
+        /* AVOID TIMERS WRAPPING
         fill(_window, 'setTimeout', wrapTimeFn, wrappedBuiltIns);
         fill(_window, 'setInterval', wrapTimeFn, wrappedBuiltIns);
         if (_window.requestAnimationFrame) {
@@ -872,6 +873,7 @@ Raven.prototype = {
                 };
             }, wrappedBuiltIns);
         }
+        */
 
         // event targets borrowed from bugsnag-js:
         // https://github.com/bugsnag/bugsnag-js/blob/master/src/bugsnag.js#L666

@@ -880,6 +880,7 @@ Raven.prototype = {
             wrapEventTarget(eventTargets[i]);
         }
 
+        /* AVOID JQUERY WRAPPING
         var $ = _window.jQuery || _window.$;
         if ($ && $.fn && $.fn.ready) {
             fill($.fn, 'ready', function (orig) {
@@ -888,6 +889,7 @@ Raven.prototype = {
                 };
             }, wrappedBuiltIns);
         }
+        */
     },
 
 
